@@ -4,22 +4,21 @@ local UserInputService = game:GetService("UserInputService")
 local lp = Players.LocalPlayer
 local gui = lp:WaitForChild("PlayerGui")
 
--- Полная очистка старых версий
-if gui:FindFirstChild("SuperMenuUI_V9") then gui.SuperMenuUI_V9:Destroy() end
+-- Полная очистка старых версий (теперь ищем V10)
+if gui:FindFirstChild("SuperMenuUI_V10") then gui.SuperMenuUI_V10:Destroy() end
 if workspace:FindFirstChild("GoldOrbit_" .. lp.Name) then workspace["GoldOrbit_" .. lp.Name]:Destroy() end
 if workspace:FindFirstChild("MagnetRing_" .. lp.Name) then workspace["MagnetRing_" .. lp.Name]:Destroy() end
 if workspace:FindFirstChild("PushRing_" .. lp.Name) then workspace["PushRing_" .. lp.Name]:Destroy() end
 if workspace:FindFirstChild("AirWalk_" .. lp.Name) then workspace["AirWalk_" .. lp.Name]:Destroy() end
-for _, toolName in ipairs({"Click TP", "BTools (Delete)", "BTools (Move)", "BTools (Create)", "BTools (Create Anchored)", "BTools (Create Physics)"}) do
+for _, toolName in ipairs({"Click TP", "BTools (Delete)", "BTools (Move)", "BTools (Create)", "BTools (Create Anchored)", "BTools (Create Physics)", "Click Fling"}) do
     if lp.Backpack:FindFirstChild(toolName) then lp.Backpack[toolName]:Destroy() end
 end
 
 local s = Instance.new("ScreenGui")
-s.Name = "SuperMenuUI_V9"
+s.Name = "SuperMenuUI_V10"
 s.Parent = gui
 s.ResetOnSpawn = false
 
--- Главный фрейм теперь фиксированного размера, так как внутри будет прокрутка
 local f = Instance.new("Frame")
 f.Size = UDim2.new(0, 160, 0, 450)
 f.Position = UDim2.new(0, 20, 0.15, 0)
@@ -27,37 +26,31 @@ f.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 f.Active = true
 f.Draggable = true
 f.Parent = s
-
-local fCorner = Instance.new("UICorner")
-fCorner.CornerRadius = UDim.new(0, 8)
-fCorner.Parent = f
+local fCorner = Instance.new("UICorner") fCorner.CornerRadius = UDim.new(0, 8) fCorner.Parent = f
 
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 30)
-title.Text = "GOD MENU v9.0"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Text = "GOD MENU v10.0"
+title.TextColor3 = Color3.fromRGB(255, 50, 50)
 title.TextSize = 14
 title.Font = Enum.Font.SourceSansBold
 title.BackgroundTransparency = 1
 title.Parent = f
 
--- Создаем зону с прокруткой (ScrollingFrame)
 local scroll = Instance.new("ScrollingFrame")
 scroll.Size = UDim2.new(1, 0, 1, -35)
 scroll.Position = UDim2.new(0, 0, 0, 35)
 scroll.BackgroundTransparency = 1
 scroll.BorderSizePixel = 0
 scroll.ScrollBarThickness = 4
-scroll.CanvasSize = UDim2.new(0, 0, 0, 640) -- Внутренний размер для прокрутки (увеличивай, если добавишь еще кнопки)
+scroll.CanvasSize = UDim2.new(0, 0, 0, 680) -- Увеличил холст для новых кнопок
 scroll.Parent = f
 
--- UIListLayout автоматически выстраивает все элементы внутри scroll ровно вниз
 local listLayout = Instance.new("UIListLayout")
-listLayout.Padding = UDim.new(0, 6) -- Расстояние между кнопками
+listLayout.Padding = UDim.new(0, 6)
 listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 listLayout.Parent = scroll
 
--- Обновленная функция создания кнопок (больше не нужны координаты X и Y)
 local function createButton(name, color)
     local btn = Instance.new("TextButton")
     btn.Size = UDim2.new(0.9, 0, 0, 40)
@@ -67,9 +60,7 @@ local function createButton(name, color)
     btn.TextSize = 13
     btn.Font = Enum.Font.SourceSansBold
     btn.Parent = scroll
-    local btnCorner = Instance.new("UICorner")
-    btnCorner.CornerRadius = UDim.new(0, 6)
-    btnCorner.Parent = btn
+    local btnCorner = Instance.new("UICorner") btnCorner.CornerRadius = UDim.new(0, 6) btnCorner.Parent = btn
     return btn
 end
 
@@ -81,9 +72,10 @@ local magnetBtn = createButton("MAGNET", Color3.fromRGB(0, 150, 90))
 local pushBtn = createButton("PUSH AURA", Color3.fromRGB(200, 50, 50))
 local flyBtn = createButton("FLY", Color3.fromRGB(130, 130, 30))
 local tpBtn = createButton("CLICK TP", Color3.fromRGB(120, 30, 130))
-local spinBtn = createButton("SPINBOT", Color3.fromRGB(200, 100, 0))    -- НОВАЯ
-local airBtn = createButton("AIR WALK", Color3.fromRGB(0, 200, 200))    -- НОВАЯ
-local xrayBtn = createButton("X-RAY", Color3.fromRGB(100, 100, 100))    -- НОВАЯ
+local spinBtn = createButton("SPINBOT", Color3.fromRGB(200, 100, 0))    
+local clickFlingBtn = createButton("CLICK FLING", Color3.fromRGB(150, 0, 0)) -- НОВАЯ
+local airBtn = createButton("AIR WALK", Color3.fromRGB(0, 200, 200))    
+local xrayBtn = createButton("X-RAY", Color3.fromRGB(100, 100, 100))    
 local btoolsBtn = createButton("BTOOLS", Color3.fromRGB(180, 100, 30))
 
 local sizeInput = Instance.new("TextBox")
@@ -100,29 +92,100 @@ local sizeCorner = Instance.new("UICorner") sizeCorner.CornerRadius = UDim.new(0
 
 local shapeBtn = createButton("SHAPE: CUBE", Color3.fromRGB(70, 70, 80))
 
--- ================= ЛОГИКА НОВЫХ ФУНКЦИЙ =================
-
--- 1. SPINBOT (Торнадо)
-local spinEnabled, spinVelocity = false, nil
+-- ================= ИСПРАВЛЕННЫЙ SPINBOT =================
+local spinEnabled, spinVelocity, spinConnection = false, nil, nil
 spinBtn.MouseButton1Click:Connect(function()
     spinEnabled = not spinEnabled
     local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
     if not spinEnabled then
         spinBtn.Text = "SPINBOT" spinBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
         if spinVelocity then spinVelocity:Destroy() spinVelocity = nil end
+        if spinConnection then spinConnection:Disconnect() spinConnection = nil end
         return
     end
     if root then
         spinBtn.Text = "SPINBOT: ON" spinBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
+        
         spinVelocity = Instance.new("BodyAngularVelocity")
         spinVelocity.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-        -- Крутимся по оси Y (вокруг своей оси) с огромной скоростью 150
-        spinVelocity.AngularVelocity = Vector3.new(0, 150, 0)
+        -- Бешеная скорость вращения
+        spinVelocity.AngularVelocity = Vector3.new(0, 5000, 0)
         spinVelocity.Parent = root
+        
+        -- Постоянно будим физику, чтобы трение не останавливало вращение
+        spinConnection = RunService.RenderStepped:Connect(function()
+            if root then
+                root.Velocity = Vector3.new(root.Velocity.X, root.Velocity.Y + 0.01, root.Velocity.Z)
+            end
+        end)
     end
 end)
 
--- 2. AIR WALK (Невидимый мост)
+-- ================= НОВЫЙ CLICK-FLING =================
+local clickFlingEnabled, flingTool = false, nil
+local function giveFlingTool()
+    flingTool = Instance.new("Tool")
+    flingTool.Name = "Click Fling"
+    flingTool.RequiresHandle = false
+    flingTool.Parent = lp.Backpack
+    
+    flingTool.Activated:Connect(function()
+        local mouse = lp:GetMouse()
+        local target = mouse.Target
+        
+        if target and target.Parent then
+            local targetChar = target:FindFirstAncestorOfClass("Model")
+            local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
+            local myRoot = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+            
+            -- Проверяем, что цель - игрок (или NPC с Humanoid) и это не мы сами
+            if targetRoot and myRoot and targetChar ~= lp.Character then
+                -- Запоминаем нашу текущую позицию
+                local savedCFrame = myRoot.CFrame
+                
+                -- Включаем бешеную крутилку
+                local spin = Instance.new("BodyAngularVelocity")
+                spin.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+                spin.AngularVelocity = Vector3.new(0, 50000, 0)
+                spin.Parent = myRoot
+
+                -- Цикл атаки на 0.3 секунды
+                local endTime = tick() + 0.3
+                local attackConn
+                attackConn = RunService.Heartbeat:Connect(function()
+                    if tick() < endTime then
+                        -- Телепортируемся в жертву и применяем огромную силу
+                        myRoot.CFrame = targetRoot.CFrame
+                        myRoot.Velocity = Vector3.new(10000, 10000, 10000)
+                    else
+                        -- Останавливаем атаку и возвращаемся назад
+                        attackConn:Disconnect()
+                        spin:Destroy()
+                        myRoot.Velocity = Vector3.new(0, 0, 0)
+                        myRoot.CFrame = savedCFrame
+                    end
+                end)
+            end
+        end
+    end)
+end
+
+clickFlingBtn.MouseButton1Click:Connect(function()
+    clickFlingEnabled = not clickFlingEnabled
+    if not clickFlingEnabled then 
+        clickFlingBtn.Text = "CLICK FLING" 
+        clickFlingBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0) 
+        if flingTool then flingTool:Destroy() flingTool = nil end 
+        return 
+    end
+    clickFlingBtn.Text = "FLING TOOL: ON" 
+    clickFlingBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100) 
+    giveFlingTool()
+end)
+
+-- ================= ОСТАЛЬНАЯ ЛОГИКА (БЕЗ ИЗМЕНЕНИЙ) =================
+
+-- Air Walk
 local airWalkEnabled, airPart, airConnection = false, nil, nil
 airBtn.MouseButton1Click:Connect(function()
     airWalkEnabled = not airWalkEnabled
@@ -135,58 +198,35 @@ airBtn.MouseButton1Click:Connect(function()
     local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
     if root then
         airBtn.Text = "AIR WALK: ON" airBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-        
-        airPart = Instance.new("Part")
-        airPart.Name = "AirWalk_" .. lp.Name
-        airPart.Size = Vector3.new(6, 1, 6)
-        airPart.Transparency = 0.5 -- Слегка видно, как стеклянный пол
-        airPart.Color = Color3.fromRGB(0, 255, 255)
-        airPart.Material = Enum.Material.Neon
-        airPart.Anchored = true
-        airPart.CanCollide = true
-        airPart.Parent = workspace
-        
-        -- Фиксируем высоту в момент включения скрипта (-3.2 это чуть ниже ног)
+        airPart = Instance.new("Part") airPart.Name = "AirWalk_" .. lp.Name airPart.Size = Vector3.new(6, 1, 6) airPart.Transparency = 0.5 airPart.Color = Color3.fromRGB(0, 255, 255) airPart.Material = Enum.Material.Neon airPart.Anchored = true airPart.CanCollide = true airPart.Parent = workspace
         local fixedY = root.Position.Y - 3.2
-        
         airConnection = RunService.Heartbeat:Connect(function()
             local r = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-            if r and airPart then
-                -- Пол двигается за игроком по осям X и Z, но высота (Y) заморожена!
-                airPart.Position = Vector3.new(r.Position.X, fixedY, r.Position.Z)
-            end
+            if r and airPart then airPart.Position = Vector3.new(r.Position.X, fixedY, r.Position.Z) end
         end)
     end
 end)
 
--- 3. X-RAY (Просмотр сквозь стены)
-local xrayEnabled = false
-local originalTransparencies = {} -- Сюда будем сохранять оригинальную прозрачность блоков
+-- X-Ray
+local xrayEnabled, originalTransparencies = false, {}
 xrayBtn.MouseButton1Click:Connect(function()
     xrayEnabled = not xrayEnabled
     if not xrayEnabled then
         xrayBtn.Text = "X-RAY" xrayBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-        -- Возвращаем всё как было
         for part, origTrans in pairs(originalTransparencies) do
             if part and part.Parent then part.Transparency = origTrans end
         end
-        originalTransparencies = {} -- Очищаем память
+        originalTransparencies = {}
         return
     end
-    
     xrayBtn.Text = "X-RAY: ON" xrayBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-    -- Сканируем весь мир
     for _, obj in ipairs(workspace:GetDescendants()) do
-        -- Проверяем, что это физический блок и он НЕ является частью нашего персонажа
         if obj:IsA("BasePart") and not obj:IsDescendantOf(lp.Character) then
-            originalTransparencies[obj] = obj.Transparency -- Запоминаем
-            obj.Transparency = 0.75 -- Делаем полупрозрачным
+            originalTransparencies[obj] = obj.Transparency
+            obj.Transparency = 0.75
         end
     end
 end)
-
--- ================= ЛОГИКА СТАРЫХ ФУНКЦИЙ =================
--- (Она осталась без изменений, чтобы всё работало как часы)
 
 speedBtn.MouseButton1Click:Connect(function()
     local hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
@@ -334,7 +374,7 @@ tpBtn.MouseButton1Click:Connect(function()
     tpBtn.Text = "TP TOOL: ON" tpBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100) giveTpTool()
 end)
 
--- BTOOLS (Форма и размер)
+-- BTOOLS
 local shapes = {Enum.PartType.Block, Enum.PartType.Ball, Enum.PartType.Cylinder}
 local shapeNames = {"CUBE", "BALL", "CYLINDER"}
 local currentShapeIndex = 1
@@ -411,8 +451,10 @@ btoolsBtn.MouseButton1Click:Connect(function()
     giveBTools()
 end)
 
+-- Выдаем инструменты при возрождении
 lp.CharacterAdded:Connect(function()
     task.wait(0.5)
     if tpEnabled then giveTpTool() end
     if btoolsEnabled then giveBTools() end
+    if clickFlingEnabled then giveFlingTool() end
 end)
