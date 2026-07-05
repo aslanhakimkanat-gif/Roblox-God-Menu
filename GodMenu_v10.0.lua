@@ -4,67 +4,29 @@ local UserInputService = game:GetService("UserInputService")
 local lp = Players.LocalPlayer
 local gui = lp:WaitForChild("PlayerGui")
 
--- Полная очистка старых версий (теперь ищем V10)
 if gui:FindFirstChild("SuperMenuUI_V10") then gui.SuperMenuUI_V10:Destroy() end
-if workspace:FindFirstChild("GoldOrbit_" .. lp.Name) then workspace["GoldOrbit_" .. lp.Name]:Destroy() end
-if workspace:FindFirstChild("MagnetRing_" .. lp.Name) then workspace["MagnetRing_" .. lp.Name]:Destroy() end
-if workspace:FindFirstChild("PushRing_" .. lp.Name) then workspace["PushRing_" .. lp.Name]:Destroy() end
-if workspace:FindFirstChild("AirWalk_" .. lp.Name) then workspace["AirWalk_" .. lp.Name]:Destroy() end
-for _, toolName in ipairs({"Click TP", "BTools (Delete)", "BTools (Move)", "BTools (Create)", "BTools (Create Anchored)", "BTools (Create Physics)", "Click Fling"}) do
-    if lp.Backpack:FindFirstChild(toolName) then lp.Backpack[toolName]:Destroy() end
+for _, v in ipairs(workspace:GetChildren()) do 
+    if v.Name:match("^GoldOrbit_") or v.Name:match("^MagnetRing_") or v.Name:match("^PushRing_") or v.Name:match("^AirWalk_") then v:Destroy() end 
+end
+for _, t in ipairs({"Click TP", "BTools (Delete)", "BTools (Move)", "BTools (Create)", "BTools (Create Anchored)", "BTools (Create Physics)", "Click Fling"}) do
+    if lp.Backpack:FindFirstChild(t) then lp.Backpack[t]:Destroy() end
 end
 
-local s = Instance.new("ScreenGui")
-s.Name = "SuperMenuUI_V10"
-s.Parent = gui
-s.ResetOnSpawn = false
+local s = Instance.new("ScreenGui", gui) s.Name = "SuperMenuUI_V10" s.ResetOnSpawn = false
+local f = Instance.new("Frame", s) f.Size = UDim2.new(0, 160, 0, 450) f.Position = UDim2.new(0, 20, 0.15, 0) f.BackgroundColor3 = Color3.fromRGB(25, 25, 30) f.Active = true f.Draggable = true
+Instance.new("UICorner", f).CornerRadius = UDim.new(0, 8)
 
-local f = Instance.new("Frame")
-f.Size = UDim2.new(0, 160, 0, 450)
-f.Position = UDim2.new(0, 20, 0.15, 0)
-f.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
-f.Active = true
-f.Draggable = true
-f.Parent = s
-local fCorner = Instance.new("UICorner") fCorner.CornerRadius = UDim.new(0, 8) fCorner.Parent = f
+local title = Instance.new("TextLabel", f) title.Size = UDim2.new(1, 0, 0, 30) title.Text = "GOD MENU v10.0" title.TextColor3 = Color3.fromRGB(255, 50, 50) title.TextSize = 14 title.Font = Enum.Font.SourceSansBold title.BackgroundTransparency = 1
 
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 30)
-title.Text = "GOD MENU v10.0"
-title.TextColor3 = Color3.fromRGB(255, 50, 50)
-title.TextSize = 14
-title.Font = Enum.Font.SourceSansBold
-title.BackgroundTransparency = 1
-title.Parent = f
-
-local scroll = Instance.new("ScrollingFrame")
-scroll.Size = UDim2.new(1, 0, 1, -35)
-scroll.Position = UDim2.new(0, 0, 0, 35)
-scroll.BackgroundTransparency = 1
-scroll.BorderSizePixel = 0
-scroll.ScrollBarThickness = 4
-scroll.CanvasSize = UDim2.new(0, 0, 0, 680) -- Увеличил холст для новых кнопок
-scroll.Parent = f
-
-local listLayout = Instance.new("UIListLayout")
-listLayout.Padding = UDim.new(0, 6)
-listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-listLayout.Parent = scroll
+local scroll = Instance.new("ScrollingFrame", f) scroll.Size = UDim2.new(1, 0, 1, -35) scroll.Position = UDim2.new(0, 0, 0, 35) scroll.BackgroundTransparency = 1 scroll.BorderSizePixel = 0 scroll.ScrollBarThickness = 4 scroll.CanvasSize = UDim2.new(0, 0, 0, 680)
+local list = Instance.new("UIListLayout", scroll) list.Padding = UDim.new(0, 6) list.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
 local function createButton(name, color)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.9, 0, 0, 40)
-    btn.BackgroundColor3 = color
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextSize = 13
-    btn.Font = Enum.Font.SourceSansBold
-    btn.Parent = scroll
-    local btnCorner = Instance.new("UICorner") btnCorner.CornerRadius = UDim.new(0, 6) btnCorner.Parent = btn
+    local btn = Instance.new("TextButton", scroll) btn.Size = UDim2.new(0.9, 0, 0, 40) btn.BackgroundColor3 = color btn.Text = name btn.TextColor3 = Color3.fromRGB(255, 255, 255) btn.TextSize = 13 btn.Font = Enum.Font.SourceSansBold
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
     return btn
 end
 
--- ================= СОЗДАНИЕ КНОПОК =================
 local speedBtn = createButton("SPEED", Color3.fromRGB(0, 120, 200))
 local jumpBtn = createButton("HIGH JUMP", Color3.fromRGB(160, 40, 160))
 local goldBtn = createButton("GOLD INF JUMP", Color3.fromRGB(212, 175, 55))
@@ -73,388 +35,175 @@ local pushBtn = createButton("PUSH AURA", Color3.fromRGB(200, 50, 50))
 local flyBtn = createButton("FLY", Color3.fromRGB(130, 130, 30))
 local tpBtn = createButton("CLICK TP", Color3.fromRGB(120, 30, 130))
 local spinBtn = createButton("SPINBOT", Color3.fromRGB(200, 100, 0))    
-local clickFlingBtn = createButton("CLICK FLING", Color3.fromRGB(150, 0, 0)) -- НОВАЯ
+local clickFlingBtn = createButton("CLICK FLING", Color3.fromRGB(150, 0, 0))
 local airBtn = createButton("AIR WALK", Color3.fromRGB(0, 200, 200))    
 local xrayBtn = createButton("X-RAY", Color3.fromRGB(100, 100, 100))    
 local btoolsBtn = createButton("BTOOLS", Color3.fromRGB(180, 100, 30))
 
-local sizeInput = Instance.new("TextBox")
-sizeInput.Size = UDim2.new(0.9, 0, 0, 40)
-sizeInput.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-sizeInput.Text = "4"
-sizeInput.PlaceholderText = "Размер"
-sizeInput.TextColor3 = Color3.fromRGB(255, 215, 0)
-sizeInput.TextSize = 14
-sizeInput.Font = Enum.Font.SourceSansBold
-sizeInput.ClearTextOnFocus = false
-sizeInput.Parent = scroll
-local sizeCorner = Instance.new("UICorner") sizeCorner.CornerRadius = UDim.new(0, 6) sizeCorner.Parent = sizeInput
-
+local sizeInput = Instance.new("TextBox", scroll) sizeInput.Size = UDim2.new(0.9, 0, 0, 40) sizeInput.BackgroundColor3 = Color3.fromRGB(40, 40, 45) sizeInput.Text = "4" sizeInput.TextColor3 = Color3.fromRGB(255, 215, 0) sizeInput.TextSize = 14 sizeInput.Font = Enum.Font.SourceSansBold sizeInput.ClearTextOnFocus = false
+Instance.new("UICorner", sizeInput).CornerRadius = UDim.new(0, 6)
 local shapeBtn = createButton("SHAPE: CUBE", Color3.fromRGB(70, 70, 80))
 
--- ================= ИСПРАВЛЕННЫЙ SPINBOT =================
-local spinEnabled, spinVelocity, spinConnection = false, nil, nil
+-- SPINBOT
+local spinOn, spinV, spinC = false, nil, nil
 spinBtn.MouseButton1Click:Connect(function()
-    spinEnabled = not spinEnabled
+    spinOn = not spinOn
     local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-    if not spinEnabled then
-        spinBtn.Text = "SPINBOT" spinBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
-        if spinVelocity then spinVelocity:Destroy() spinVelocity = nil end
-        if spinConnection then spinConnection:Disconnect() spinConnection = nil end
+    if not spinOn then
+        spinBtn.Text, spinBtn.BackgroundColor3 = "SPINBOT", Color3.fromRGB(200, 100, 0)
+        if spinV then spinV:Destroy() spinV = nil end
+        if spinC then spinC:Disconnect() spinC = nil end
         return
     end
     if root then
-        spinBtn.Text = "SPINBOT: ON" spinBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-        
-        spinVelocity = Instance.new("BodyAngularVelocity")
-        spinVelocity.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-        -- Бешеная скорость вращения
-        spinVelocity.AngularVelocity = Vector3.new(0, 5000, 0)
-        spinVelocity.Parent = root
-        
-        -- Постоянно будим физику, чтобы трение не останавливало вращение
-        spinConnection = RunService.RenderStepped:Connect(function()
-            if root then
-                root.Velocity = Vector3.new(root.Velocity.X, root.Velocity.Y + 0.01, root.Velocity.Z)
-            end
-        end)
+        spinBtn.Text, spinBtn.BackgroundColor3 = "SPINBOT: ON", Color3.fromRGB(0, 180, 100)
+        spinV = Instance.new("BodyAngularVelocity", root) spinV.MaxTorque = Vector3.new(math.huge, math.huge, math.huge) spinV.AngularVelocity = Vector3.new(0, 5000, 0)
+        spinC = RunService.RenderStepped:Connect(function() if root then root.Velocity = Vector3.new(root.Velocity.X, root.Velocity.Y + 0.01, root.Velocity.Z) end end)
     end
 end)
 
--- ================= НОВЫЙ CLICK-FLING =================
-local clickFlingEnabled, flingTool = false, nil
-local function giveFlingTool()
-    flingTool = Instance.new("Tool")
-    flingTool.Name = "Click Fling"
-    flingTool.RequiresHandle = false
-    flingTool.Parent = lp.Backpack
-    
-    flingTool.Activated:Connect(function()
-        local mouse = lp:GetMouse()
-        local target = mouse.Target
-        
-        if target and target.Parent then
-            local targetChar = target:FindFirstAncestorOfClass("Model")
-            local targetRoot = targetChar and targetChar:FindFirstChild("HumanoidRootPart")
-            local myRoot = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-            
-            -- Проверяем, что цель - игрок (или NPC с Humanoid) и это не мы сами
-            if targetRoot and myRoot and targetChar ~= lp.Character then
-                -- Запоминаем нашу текущую позицию
-                local savedCFrame = myRoot.CFrame
-                
-                -- Включаем бешеную крутилку
-                local spin = Instance.new("BodyAngularVelocity")
-                spin.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-                spin.AngularVelocity = Vector3.new(0, 50000, 0)
-                spin.Parent = myRoot
-
-                -- Цикл атаки на 0.3 секунды
-                local endTime = tick() + 0.3
-                local attackConn
-                attackConn = RunService.Heartbeat:Connect(function()
-                    if tick() < endTime then
-                        -- Телепортируемся в жертву и применяем огромную силу
-                        myRoot.CFrame = targetRoot.CFrame
-                        myRoot.Velocity = Vector3.new(10000, 10000, 10000)
-                    else
-                        -- Останавливаем атаку и возвращаемся назад
-                        attackConn:Disconnect()
-                        spin:Destroy()
-                        myRoot.Velocity = Vector3.new(0, 0, 0)
-                        myRoot.CFrame = savedCFrame
-                    end
-                end)
-            end
+-- CLICK-FLING
+local flingOn, flingT = false, nil
+local function giveFling()
+    flingT = Instance.new("Tool", lp.Backpack) flingT.Name = "Click Fling" flingT.RequiresHandle = false
+    flingT.Activated:Connect(function()
+        local tar = lp:GetMouse().Target
+        local tChar = tar and tar.Parent and tar:FindFirstAncestorOfClass("Model")
+        local tRoot = tChar and tChar:FindFirstChild("HumanoidRootPart")
+        local mRoot = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+        if tRoot and mRoot and tChar ~= lp.Character then
+            local oldCF = mRoot.CFrame
+            local sp = Instance.new("BodyAngularVelocity", mRoot) sp.MaxTorque = Vector3.new(math.huge, math.huge, math.huge) sp.AngularVelocity = Vector3.new(0, 50000, 0)
+            local endT = tick() + 0.3
+            local c; c = RunService.Heartbeat:Connect(function()
+                if tick() < endT then mRoot.CFrame, mRoot.Velocity = tRoot.CFrame, Vector3.new(10000, 10000, 10000)
+                else c:Disconnect() sp:Destroy() mRoot.Velocity = Vector3.new(0,0,0) mRoot.CFrame = oldCF end
+            end)
         end
     end)
 end
-
 clickFlingBtn.MouseButton1Click:Connect(function()
-    clickFlingEnabled = not clickFlingEnabled
-    if not clickFlingEnabled then 
-        clickFlingBtn.Text = "CLICK FLING" 
-        clickFlingBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 0) 
-        if flingTool then flingTool:Destroy() flingTool = nil end 
-        return 
-    end
-    clickFlingBtn.Text = "FLING TOOL: ON" 
-    clickFlingBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100) 
-    giveFlingTool()
+    flingOn = not flingOn
+    clickFlingBtn.Text, clickFlingBtn.BackgroundColor3 = flingOn and "FLING TOOL: ON" or "CLICK FLING", flingOn and Color3.fromRGB(0, 180, 100) or Color3.fromRGB(150, 0, 0)
+    if flingOn then giveFling() elseif flingT then flingT:Destroy() flingT = nil end
 end)
 
--- ================= ОСТАЛЬНАЯ ЛОГИКА (БЕЗ ИЗМЕНЕНИЙ) =================
-
--- Air Walk
-local airWalkEnabled, airPart, airConnection = false, nil, nil
+-- AIR WALK
+local airOn, airP, airC = false, nil, nil
 airBtn.MouseButton1Click:Connect(function()
-    airWalkEnabled = not airWalkEnabled
-    if not airWalkEnabled then
-        airBtn.Text = "AIR WALK" airBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 200)
-        if airPart then airPart:Destroy() airPart = nil end
-        if airConnection then airConnection:Disconnect() airConnection = nil end
-        return
+    airOn = not airOn
+    if not airOn then
+        airBtn.Text, airBtn.BackgroundColor3 = "AIR WALK", Color3.fromRGB(0, 200, 200)
+        if airP then airP:Destroy() airP = nil end if airC then airC:Disconnect() airC = nil end return
     end
     local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
     if root then
-        airBtn.Text = "AIR WALK: ON" airBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-        airPart = Instance.new("Part") airPart.Name = "AirWalk_" .. lp.Name airPart.Size = Vector3.new(6, 1, 6) airPart.Transparency = 0.5 airPart.Color = Color3.fromRGB(0, 255, 255) airPart.Material = Enum.Material.Neon airPart.Anchored = true airPart.CanCollide = true airPart.Parent = workspace
-        local fixedY = root.Position.Y - 3.2
-        airConnection = RunService.Heartbeat:Connect(function()
-            local r = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-            if r and airPart then airPart.Position = Vector3.new(r.Position.X, fixedY, r.Position.Z) end
-        end)
+        airBtn.Text, airBtn.BackgroundColor3 = "AIR WALK: ON", Color3.fromRGB(0, 180, 100)
+        airP = Instance.new("Part", workspace) airP.Name = "AirWalk_" .. lp.Name airP.Size = Vector3.new(6, 1, 6) airP.Transparency = 0.5 airP.Color = Color3.fromRGB(0, 255, 255) airP.Material = Enum.Material.Neon airP.Anchored, airP.CanCollide = true, true
+        local fY = root.Position.Y - 3.2
+        airC = RunService.Heartbeat:Connect(function() local r = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") if r and airP then airP.Position = Vector3.new(r.Position.X, fY, r.Position.Z) end end)
     end
 end)
 
--- X-Ray
-local xrayEnabled, originalTransparencies = false, {}
+-- X-RAY
+local xrayOn, origTrans = false, {}
 xrayBtn.MouseButton1Click:Connect(function()
-    xrayEnabled = not xrayEnabled
-    if not xrayEnabled then
-        xrayBtn.Text = "X-RAY" xrayBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-        for part, origTrans in pairs(originalTransparencies) do
-            if part and part.Parent then part.Transparency = origTrans end
-        end
-        originalTransparencies = {}
-        return
-    end
-    xrayBtn.Text = "X-RAY: ON" xrayBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-    for _, obj in ipairs(workspace:GetDescendants()) do
-        if obj:IsA("BasePart") and not obj:IsDescendantOf(lp.Character) then
-            originalTransparencies[obj] = obj.Transparency
-            obj.Transparency = 0.75
-        end
-    end
+    xrayOn = not xrayOn
+    xrayBtn.Text, xrayBtn.BackgroundColor3 = xrayOn and "X-RAY: ON" or "X-RAY", xrayOn and Color3.fromRGB(0, 180, 100) or Color3.fromRGB(100, 100, 100)
+    if not xrayOn then for p, t in pairs(origTrans) do if p and p.Parent then p.Transparency = t end end origTrans = {} return end
+    for _, o in ipairs(workspace:GetDescendants()) do if o:IsA("BasePart") and not o:IsDescendantOf(lp.Character) then origTrans[o] = o.Transparency o.Transparency = 0.75 end end
 end)
 
 speedBtn.MouseButton1Click:Connect(function()
-    local hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
-    if hum then
-        if hum.WalkSpeed == 16 then hum.WalkSpeed = 100 speedBtn.Text = "SPEED: ON" speedBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-        else hum.WalkSpeed = 16 speedBtn.Text = "SPEED" speedBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 200) end
-    end
+    local h = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+    if h then h.WalkSpeed = h.WalkSpeed == 16 and 100 or 16 speedBtn.Text, speedBtn.BackgroundColor3 = h.WalkSpeed == 100 and "SPEED: ON" or "SPEED", h.WalkSpeed == 100 and Color3.fromRGB(0, 180, 100) or Color3.fromRGB(0, 120, 200) end
 end)
 
 jumpBtn.MouseButton1Click:Connect(function()
-    local hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
-    if hum then
-        if hum.JumpPower == 50 or hum.JumpHeight == 7 then hum.JumpPower = 150 hum.JumpHeight = 50 hum.UseJumpPower = true jumpBtn.Text = "H-JUMP: ON" jumpBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-        else hum.JumpPower = 50 hum.JumpHeight = 7 jumpBtn.Text = "HIGH JUMP" jumpBtn.BackgroundColor3 = Color3.fromRGB(160, 40, 160) end
-    end
+    local h = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+    if h then h.JumpPower = h.JumpPower == 50 and 150 or 50 h.JumpHeight = h.JumpPower == 150 and 50 or 7 h.UseJumpPower = true jumpBtn.Text, jumpBtn.BackgroundColor3 = h.JumpPower == 150 and "H-JUMP: ON" or "HIGH JUMP", h.JumpPower == 150 and Color3.fromRGB(0, 180, 100) or Color3.fromRGB(160, 40, 160) end
 end)
 
-local infJumpEnabled, goldFolder, goldConnection, jumpConnection = false, nil, nil, nil
+-- GOLD JUMP / MAGNET / PUSH
+local gjOn, gFold, gC, jC = false, nil, nil, nil
 goldBtn.MouseButton1Click:Connect(function()
-    infJumpEnabled = not infJumpEnabled
-    if not infJumpEnabled then
-        goldBtn.Text = "GOLD INF JUMP" goldBtn.BackgroundColor3 = Color3.fromRGB(212, 175, 55)
-        if goldFolder then goldFolder:Destroy() goldFolder = nil end
-        if goldConnection then goldConnection:Disconnect() goldConnection = nil end
-        if jumpConnection then jumpConnection:Disconnect() jumpConnection = nil end
-        return
+    gjOn = not gjOn
+    if not gjOn then
+        goldBtn.Text, goldBtn.BackgroundColor3 = "GOLD INF JUMP", Color3.fromRGB(212, 175, 55)
+        if gFold then gFold:Destroy() gFold = nil end if gC then gC:Disconnect() gC = nil end if jC then jC:Disconnect() jC = nil end return
     end
-    goldBtn.Text = "GOLD JUMP: ON" goldBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-    goldFolder = Instance.new("Folder") goldFolder.Name = "GoldOrbit_" .. lp.Name goldFolder.Parent = workspace
-    local parts = {}
-    for i = 1, 7 do
-        local p = Instance.new("Part") p.Shape = Enum.PartType.Ball p.Size = Vector3.new(1.8, 1.8, 1.8) p.Anchored = true p.CanCollide = false p.Material = Enum.Material.Neon p.Color = Color3.fromRGB(255, 215, 0) p.Parent = goldFolder table.insert(parts, p)
-    end
-    goldConnection = RunService.Heartbeat:Connect(function()
-        local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-        if not root or not goldFolder or not goldFolder.Parent then if goldConnection then goldConnection:Disconnect() end return end
-        local currentTime = tick() * 2.5
-        for i, p in ipairs(parts) do
-            local angle = currentTime + (i * (math.pi * 2 / 7))
-            p.Position = Vector3.new(root.Position.X + math.cos(angle) * 7.5, root.Position.Y, root.Position.Z + math.sin(angle) * 7.5)
-        end
+    goldBtn.Text, goldBtn.BackgroundColor3 = "GOLD JUMP: ON", Color3.fromRGB(0, 180, 100)
+    gFold = Instance.new("Folder", workspace) gFold.Name = "GoldOrbit_" .. lp.Name
+    local parts = {} for i = 1, 7 do local p = Instance.new("Part", gFold) p.Shape, p.Size, p.Anchored, p.CanCollide, p.Material, p.Color = Enum.PartType.Ball, Vector3.new(1.8,1.8,1.8), true, false, Enum.Material.Neon, Color3.fromRGB(255,215,0) table.insert(parts, p) end
+    gC = RunService.Heartbeat:Connect(function()
+        local r = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") if not r then return end
+        for i, p in ipairs(parts) do local a = (tick()*2.5) + (i*(math.pi*2/7)) p.Position = Vector3.new(r.Position.X + math.cos(a)*7.5, r.Position.Y, r.Position.Z + math.sin(a)*7.5) end
     end)
-    jumpConnection = UserInputService.JumpRequest:Connect(function()
-        local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-        if root and infJumpEnabled then root.Velocity = Vector3.new(root.Velocity.X, 60, root.Velocity.Z) end
-    end)
+    jC = UserInputService.JumpRequest:Connect(function() local r = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") if r and gjOn then r.Velocity = Vector3.new(r.Velocity.X, 60, r.Velocity.Z) end end)
 end)
 
-local magnetEnabled, magnetConnection, magnetRing = false, nil, nil
-magnetBtn.MouseButton1Click:Connect(function()
-    magnetEnabled = not magnetEnabled
-    if not magnetEnabled then
-        magnetBtn.Text = "MAGNET" magnetBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 90)
-        if magnetConnection then magnetConnection:Disconnect() magnetConnection = nil end
-        if magnetRing then magnetRing:Destroy() magnetRing = nil end
-        return
-    end
-    magnetBtn.Text = "MAGNET: ON" magnetBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-    magnetRing = Instance.new("Part") magnetRing.Name = "MagnetRing_" .. lp.Name magnetRing.Shape = Enum.PartType.Cylinder magnetRing.Size = Vector3.new(0.2, 60, 60) magnetRing.Orientation = Vector3.new(0, 0, 90) magnetRing.Color = Color3.fromRGB(0, 255, 150) magnetRing.Material = Enum.Material.Neon magnetRing.Transparency = 0.9 magnetRing.Anchored = true magnetRing.CanCollide = false magnetRing.Parent = workspace
-    magnetConnection = RunService.Heartbeat:Connect(function()
-        local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-        if not root or not magnetRing then return end
-        magnetRing.Position = root.Position - Vector3.new(0, 2.5, 0)
-        for _, obj in ipairs(workspace:GetDescendants()) do
-            if obj:IsA("BasePart") and not obj.Anchored and obj.Parent ~= lp.Character and not obj.Parent:FindFirstChildOfClass("Humanoid") then
-                local distance = (root.Position - obj.Position).Magnitude
-                if distance <= 30 then obj.Velocity = (root.Position - obj.Position).Unit * 40 end
+local function makeAura(name, color, size, isPush)
+    local on, ring, conn = false, nil, nil
+    return function(btn)
+        on = not on
+        btn.Text, btn.BackgroundColor3 = on and (name..": ON") or name, on and Color3.fromRGB(0, 180, 100) or color
+        if not on then if ring then ring:Destroy() ring = nil end if conn then conn:Disconnect() conn = nil end return end
+        ring = Instance.new("Part", workspace) ring.Name = name.."Ring_"..lp.Name ring.Shape, ring.Size, ring.Orientation, ring.Color, ring.Material, ring.Transparency, ring.Anchored, ring.CanCollide = Enum.PartType.Cylinder, size, Vector3.new(0,0,90), color, Enum.Material.Neon, isPush and 0.88 or 0.9, true, false
+        conn = RunService.Heartbeat:Connect(function()
+            local r = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") if not r or not ring then return end
+            ring.Position = r.Position - Vector3.new(0, 2.5, 0)
+            for _, o in ipairs(workspace:GetDescendants()) do
+                if o:IsA("BasePart") and not o.Anchored and o.Parent ~= lp.Character and not o.Parent:FindFirstChildOfClass("Humanoid") then
+                    local d = (r.Position - o.Position).Magnitude
+                    if d <= size.Y/2 then o.Velocity = isPush and ((o.Position - r.Position).Unit * 70 + Vector3.new(0, 20, 0)) or ((r.Position - o.Position).Unit * 40) end
+                end
             end
-        end
-    end)
-end)
-
-local pushEnabled, pushConnection, pushRing = false, nil, nil
-pushBtn.MouseButton1Click:Connect(function()
-    pushEnabled = not pushEnabled
-    if not pushEnabled then
-        pushBtn.Text = "PUSH AURA" pushBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-        if pushConnection then pushConnection:Disconnect() pushConnection = nil end
-        if pushRing then pushRing:Destroy() pushRing = nil end
-        return
+        end)
     end
-    pushBtn.Text = "PUSH: ON" pushBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-    pushRing = Instance.new("Part") pushRing.Name = "PushRing_" .. lp.Name pushRing.Shape = Enum.PartType.Cylinder pushRing.Size = Vector3.new(0.2, 50, 50) pushRing.Orientation = Vector3.new(0, 0, 90) pushRing.Color = Color3.fromRGB(255, 50, 50) pushRing.Material = Enum.Material.Neon pushRing.Transparency = 0.88 pushRing.Anchored = true pushRing.CanCollide = false pushRing.Parent = workspace
-    pushConnection = RunService.Heartbeat:Connect(function()
-        local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-        if not root or not pushRing then return end
-        pushRing.Position = root.Position - Vector3.new(0, 2.5, 0)
-        for _, obj in ipairs(workspace:GetDescendants()) do
-            if obj:IsA("BasePart") and not obj.Anchored and obj.Parent ~= lp.Character and not obj.Parent:FindFirstChildOfClass("Humanoid") then
-                local distance = (root.Position - obj.Position).Magnitude
-                if distance <= 25 then obj.Velocity = (obj.Position - root.Position).Unit * 70 + Vector3.new(0, 20, 0) end
-            end
-        end
-    end)
-end)
+end
+magnetBtn.MouseButton1Click:Connect(function() makeAura("MAGNET", Color3.fromRGB(0, 150, 90), Vector3.new(0.2, 60, 60), false)(magnetBtn) end)
+pushBtn.MouseButton1Click:Connect(function() makeAura("PUSH", Color3.fromRGB(200, 50, 50), Vector3.new(0.2, 50, 50), true)(pushBtn) end)
 
-local flyEnabled, flyConnection, bv, bg = false, nil, nil, nil
+-- FLY
+local flyOn, flyC, fV, fG = false, nil, nil, nil
 flyBtn.MouseButton1Click:Connect(function()
-    flyEnabled = not flyEnabled
-    if not flyEnabled then
-        flyBtn.Text = "FLY" flyBtn.BackgroundColor3 = Color3.fromRGB(130, 130, 30)
-        if flyConnection then flyConnection:Disconnect() flyConnection = nil end
-        if bv then bv:Destroy() bv = nil end
-        if bg then bg:Destroy() bg = nil end
-        local hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
-        if hum then hum.PlatformStand = false end
-        return
-    end
-    flyBtn.Text = "FLY: ON" flyBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-    local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-    local hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
-    if root and hum then
-        hum.PlatformStand = true
-        bv = Instance.new("BodyVelocity") bv.MaxForce = Vector3.new(9e9, 9e9, 9e9) bv.Velocity = Vector3.new(0, 0, 0) bv.Parent = root
-        bg = Instance.new("BodyGyro") bg.MaxTorque = Vector3.new(9e9, 9e9, 9e9) bg.CFrame = root.CFrame bg.Parent = root
-        flyConnection = RunService.RenderStepped:Connect(function()
-            local currentSubRoot = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-            local currentSubHum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
-            if not currentSubRoot or not currentSubHum or not bv or not bg then return end
-            local camCFrame = workspace.CurrentCamera.CFrame
-            bg.CFrame = camCFrame
-            local moveDir = currentSubHum.MoveDirection
-            if moveDir.Magnitude > 0 then
-                local localMove = camCFrame:VectorToObjectSpace(moveDir)
-                bv.Velocity = (camCFrame.LookVector * -localMove.Z + camCFrame.RightVector * localMove.X) * 60
-            else bv.Velocity = Vector3.new(0, 0, 0) end
-            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then bv.Velocity = bv.Velocity + Vector3.new(0, 60, 0)
-            elseif UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then bv.Velocity = bv.Velocity + Vector3.new(0, -60, 0) end
+    flyOn = not flyOn
+    flyBtn.Text, flyBtn.BackgroundColor3 = flyOn and "FLY: ON" or "FLY", flyOn and Color3.fromRGB(0, 180, 100) or Color3.fromRGB(130, 130, 30)
+    local h = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
+    local r = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+    if not flyOn then if flyC then flyC:Disconnect() flyC = nil end if fV then fV:Destroy() fV = nil end if fG then fG:Destroy() fG = nil end if h then h.PlatformStand = false end return end
+    if r and h then
+        h.PlatformStand = true
+        fV = Instance.new("BodyVelocity", r) fV.MaxForce = Vector3.new(9e9, 9e9, 9e9) fV.Velocity = Vector3.new(0,0,0)
+        fG = Instance.new("BodyGyro", r) fG.MaxTorque = Vector3.new(9e9, 9e9, 9e9) fG.CFrame = r.CFrame
+        flyC = RunService.RenderStepped:Connect(function()
+            local camCF = workspace.CurrentCamera.CFrame fG.CFrame = camCF
+            if h.MoveDirection.Magnitude > 0 then local lM = camCF:VectorToObjectSpace(h.MoveDirection) fV.Velocity = (camCF.LookVector * -lM.Z + camCF.RightVector * lM.X) * 60 else fV.Velocity = Vector3.new(0,0,0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then fV.Velocity = fV.Velocity + Vector3.new(0, 60, 0)
+            elseif UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then fV.Velocity = fV.Velocity + Vector3.new(0, -60, 0) end
         end)
     end
 end)
 
-local tpEnabled, tpTool = false, nil
-local function giveTpTool()
-    tpTool = Instance.new("Tool") tpTool.Name = "Click TP" tpTool.RequiresHandle = false tpTool.Parent = lp.Backpack
-    tpTool.Activated:Connect(function()
-        local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
-        local mouse = lp:GetMouse()
-        if root and mouse and mouse.Hit then root.CFrame = CFrame.new(mouse.Hit.Position + Vector3.new(0, 3, 0)) end
-    end)
-end
-tpBtn.MouseButton1Click:Connect(function()
-    tpEnabled = not tpEnabled
-    if not tpEnabled then tpBtn.Text = "CLICK TP" tpBtn.BackgroundColor3 = Color3.fromRGB(120, 30, 130) if tpTool then tpTool:Destroy() tpTool = nil end return end
-    tpBtn.Text = "TP TOOL: ON" tpBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100) giveTpTool()
-end)
+-- CLICK TP
+local tpOn, tpT = false, nil
+local function giveTp() tpT = Instance.new("Tool", lp.Backpack) tpT.Name = "Click TP" tpT.RequiresHandle = false tpT.Activated:Connect(function() local r = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") local m = lp:GetMouse() if r and m.Hit then r.CFrame = CFrame.new(m.Hit.Position + Vector3.new(0, 3, 0)) end end) end
+tpBtn.MouseButton1Click:Connect(function() tpOn = not tpOn tpBtn.Text, tpBtn.BackgroundColor3 = tpOn and "TP TOOL: ON" or "CLICK TP", tpOn and Color3.fromRGB(0, 180, 100) or Color3.fromRGB(120, 30, 130) if tpOn then giveTp() elseif tpT then tpT:Destroy() tpT = nil end end)
 
 -- BTOOLS
-local shapes = {Enum.PartType.Block, Enum.PartType.Ball, Enum.PartType.Cylinder}
-local shapeNames = {"CUBE", "BALL", "CYLINDER"}
-local currentShapeIndex = 1
-
-shapeBtn.MouseButton1Click:Connect(function()
-    currentShapeIndex = currentShapeIndex + 1
-    if currentShapeIndex > #shapes then currentShapeIndex = 1 end
-    shapeBtn.Text = "SHAPE: " .. shapeNames[currentShapeIndex]
-end)
-
-local function getBlockSize()
-    local val = tonumber(sizeInput.Text)
-    if val and val > 0.1 then return val end
-    return 4
+local shapes, shapeNames, cSI = {Enum.PartType.Block, Enum.PartType.Ball, Enum.PartType.Cylinder}, {"CUBE", "BALL", "CYLINDER"}, 1
+shapeBtn.MouseButton1Click:Connect(function() cSI = cSI + 1 if cSI > #shapes then cSI = 1 end shapeBtn.Text = "SHAPE: " .. shapeNames[cSI] end)
+local btOn, btD, btM, btA, btP, selP = false, nil, nil, nil, nil, nil
+local function giveBT()
+    btD = Instance.new("Tool", lp.Backpack) btD.Name = "BTools (Delete)" btD.RequiresHandle = false btD.Activated:Connect(function() local m = lp:GetMouse() if m.Target and m.Target.Name ~= "Baseplate" and not m.Target:IsA("Terrain") and not (m.Target:FindFirstAncestorOfClass("Model") and m.Target:FindFirstAncestorOfClass("Model"):FindFirstChildOfClass("Humanoid")) then m.Target:Destroy() end end)
+    btM = Instance.new("Tool", lp.Backpack) btM.Name = "BTools (Move)" btM.RequiresHandle = false btM.Activated:Connect(function() local m = lp:GetMouse() if selP then if selP.Parent then selP.Position = m.Hit.Position + Vector3.new(0, selP.Size.Y / 2, 0) end selP = nil btM.Name = "BTools (Move)" elseif m.Target and m.Target.Name ~= "Baseplate" and not m.Target:IsA("Terrain") and not (m.Target:FindFirstAncestorOfClass("Model") and m.Target:FindFirstAncestorOfClass("Model"):FindFirstChildOfClass("Humanoid")) then selP = m.Target btM.Name = "[ КЛИКНИ КУДА ]" end end)
+    local function createPart(anc, col) local m = lp:GetMouse() if m.Hit then local s = tonumber(sizeInput.Text) or 4 local p = Instance.new("Part", workspace) p.Shape, p.Size, p.Position, p.Anchored, p.Material, p.Color = shapes[cSI], Vector3.new(s,s,s), m.Hit.Position + Vector3.new(0, s/2, 0), anc, Enum.Material.SmoothPlastic, col end end
+    btA = Instance.new("Tool", lp.Backpack) btA.Name = "BTools (Create Anchored)" btA.RequiresHandle = false btA.Activated:Connect(function() createPart(true, Color3.fromRGB(0, 150, 255)) end)
+    btP = Instance.new("Tool", lp.Backpack) btP.Name = "BTools (Create Physics)" btP.RequiresHandle = false btP.Activated:Connect(function() createPart(false, Color3.fromRGB(255, 130, 0)) end)
 end
-
-local btoolsEnabled, btoolsDeleteTool, btoolsMoveTool, btoolsAnchoredTool, btoolsPhysicsTool, selectedPart = false, nil, nil, nil, nil, nil
-local function giveBTools()
-    btoolsDeleteTool = Instance.new("Tool") btoolsDeleteTool.Name = "BTools (Delete)" btoolsDeleteTool.RequiresHandle = false btoolsDeleteTool.Parent = lp.Backpack
-    btoolsDeleteTool.Activated:Connect(function()
-        local mouse = lp:GetMouse()
-        if mouse and mouse.Target and mouse.Target.Name ~= "Baseplate" and not mouse.Target:IsA("Terrain") then
-            if not (mouse.Target:FindFirstAncestorOfClass("Model") and mouse.Target:FindFirstAncestorOfClass("Model"):FindFirstChildOfClass("Humanoid")) then mouse.Target:Destroy() end
-        end
-    end)
-    btoolsMoveTool = Instance.new("Tool") btoolsMoveTool.Name = "BTools (Move)" btoolsMoveTool.RequiresHandle = false btoolsMoveTool.Parent = lp.Backpack
-    btoolsMoveTool.Activated:Connect(function()
-        local mouse = lp:GetMouse()
-        if not mouse then return end
-        if selectedPart then
-            if selectedPart.Parent then selectedPart.Position = mouse.Hit.Position + Vector3.new(0, selectedPart.Size.Y / 2, 0) end
-            selectedPart = nil btoolsMoveTool.Name = "BTools (Move)"
-        elseif mouse.Target and mouse.Target.Name ~= "Baseplate" and not mouse.Target:IsA("Terrain") then
-            if not (mouse.Target:FindFirstAncestorOfClass("Model") and mouse.Target:FindFirstAncestorOfClass("Model"):FindFirstChildOfClass("Humanoid")) then
-                selectedPart = mouse.Target btoolsMoveTool.Name = "[ КЛИКНИ КУДА ПЕРЕНЕСТИ ]"
-            end
-        end
-    end)
-    btoolsMoveTool.Unequipped:Connect(function() selectedPart = nil btoolsMoveTool.Name = "BTools (Move)" end)
-
-    btoolsAnchoredTool = Instance.new("Tool") btoolsAnchoredTool.Name = "BTools (Create Anchored)" btoolsAnchoredTool.RequiresHandle = false btoolsAnchoredTool.Parent = lp.Backpack
-    btoolsAnchoredTool.Activated:Connect(function()
-        local mouse = lp:GetMouse()
-        if mouse and mouse.Hit then
-            local size = getBlockSize()
-            local newPart = Instance.new("Part") newPart.Shape = shapes[currentShapeIndex] newPart.Size = Vector3.new(size, size, size)
-            newPart.Position = mouse.Hit.Position + Vector3.new(0, size / 2, 0) newPart.Anchored = true newPart.Material = Enum.Material.SmoothPlastic newPart.Color = Color3.fromRGB(0, 150, 255) newPart.Parent = workspace
-        end
-    end)
-
-    btoolsPhysicsTool = Instance.new("Tool") btoolsPhysicsTool.Name = "BTools (Create Physics)" btoolsPhysicsTool.RequiresHandle = false btoolsPhysicsTool.Parent = lp.Backpack
-    btoolsPhysicsTool.Activated:Connect(function()
-        local mouse = lp:GetMouse()
-        if mouse and mouse.Hit then
-            local size = getBlockSize()
-            local newPart = Instance.new("Part") newPart.Shape = shapes[currentShapeIndex] newPart.Size = Vector3.new(size, size, size)
-            newPart.Position = mouse.Hit.Position + Vector3.new(0, size / 2, 0) newPart.Anchored = false newPart.Material = Enum.Material.SmoothPlastic newPart.Color = Color3.fromRGB(255, 130, 0) newPart.Parent = workspace
-        end
-    end)
-end
-
 btoolsBtn.MouseButton1Click:Connect(function()
-    btoolsEnabled = not btoolsEnabled
-    if not btoolsEnabled then
-        btoolsBtn.Text = "BTOOLS" btoolsBtn.BackgroundColor3 = Color3.fromRGB(180, 100, 30)
-        if btoolsDeleteTool then btoolsDeleteTool:Destroy() btoolsDeleteTool = nil end
-        if btoolsMoveTool then btoolsMoveTool:Destroy() btoolsMoveTool = nil end
-        if btoolsAnchoredTool then btoolsAnchoredTool:Destroy() btoolsAnchoredTool = nil end
-        if btoolsPhysicsTool then btoolsPhysicsTool:Destroy() btoolsPhysicsTool = nil end
-        selectedPart = nil
-        return
-    end
-    btoolsBtn.Text = "BTOOLS: ON" btoolsBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
-    giveBTools()
+    btOn = not btOn btoolsBtn.Text, btoolsBtn.BackgroundColor3 = btOn and "BTOOLS: ON" or "BTOOLS", btOn and Color3.fromRGB(0, 180, 100) or Color3.fromRGB(180, 100, 30)
+    if not btOn then for _, t in ipairs({btD, btM, btA, btP}) do if t then t:Destroy() end end selP = nil else giveBT() end
 end)
 
--- Выдаем инструменты при возрождении
-lp.CharacterAdded:Connect(function()
-    task.wait(0.5)
-    if tpEnabled then giveTpTool() end
-    if btoolsEnabled then giveBTools() end
-    if clickFlingEnabled then giveFlingTool() end
-end)
+lp.CharacterAdded:Connect(function() task.wait(0.5) if tpOn then giveTp() end if btOn then giveBT() end if flingOn then giveFling() end end)
