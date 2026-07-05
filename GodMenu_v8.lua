@@ -4,23 +4,24 @@ local UserInputService = game:GetService("UserInputService")
 local lp = Players.LocalPlayer
 local gui = lp:WaitForChild("PlayerGui")
 
--- Полная очистка старых версий скрипта и предметов
-if gui:FindFirstChild("SuperMenuUI_V8_Final") then gui.SuperMenuUI_V8_Final:Destroy() end
+-- Полная очистка старых версий
+if gui:FindFirstChild("SuperMenuUI_V9") then gui.SuperMenuUI_V9:Destroy() end
 if workspace:FindFirstChild("GoldOrbit_" .. lp.Name) then workspace["GoldOrbit_" .. lp.Name]:Destroy() end
 if workspace:FindFirstChild("MagnetRing_" .. lp.Name) then workspace["MagnetRing_" .. lp.Name]:Destroy() end
 if workspace:FindFirstChild("PushRing_" .. lp.Name) then workspace["PushRing_" .. lp.Name]:Destroy() end
+if workspace:FindFirstChild("AirWalk_" .. lp.Name) then workspace["AirWalk_" .. lp.Name]:Destroy() end
 for _, toolName in ipairs({"Click TP", "BTools (Delete)", "BTools (Move)", "BTools (Create)", "BTools (Create Anchored)", "BTools (Create Physics)"}) do
     if lp.Backpack:FindFirstChild(toolName) then lp.Backpack[toolName]:Destroy() end
 end
 
 local s = Instance.new("ScreenGui")
-s.Name = "SuperMenuUI_V8_Final"
+s.Name = "SuperMenuUI_V9"
 s.Parent = gui
 s.ResetOnSpawn = false
 
--- Увеличил высоту фрейма до 535, чтобы влезла кнопка выбора формы
+-- Главный фрейм теперь фиксированного размера, так как внутри будет прокрутка
 local f = Instance.new("Frame")
-f.Size = UDim2.new(0, 150, 0, 535)
+f.Size = UDim2.new(0, 160, 0, 450)
 f.Position = UDim2.new(0, 20, 0.15, 0)
 f.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 f.Active = true
@@ -33,43 +34,60 @@ fCorner.Parent = f
 
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 30)
-title.Text = "GOD MENU v8.5"
+title.Text = "GOD MENU v9.0"
 title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextSize = 13
+title.TextSize = 14
 title.Font = Enum.Font.SourceSansBold
 title.BackgroundTransparency = 1
 title.Parent = f
 
-local function createButton(name, pos, color)
+-- Создаем зону с прокруткой (ScrollingFrame)
+local scroll = Instance.new("ScrollingFrame")
+scroll.Size = UDim2.new(1, 0, 1, -35)
+scroll.Position = UDim2.new(0, 0, 0, 35)
+scroll.BackgroundTransparency = 1
+scroll.BorderSizePixel = 0
+scroll.ScrollBarThickness = 4
+scroll.CanvasSize = UDim2.new(0, 0, 0, 640) -- Внутренний размер для прокрутки (увеличивай, если добавишь еще кнопки)
+scroll.Parent = f
+
+-- UIListLayout автоматически выстраивает все элементы внутри scroll ровно вниз
+local listLayout = Instance.new("UIListLayout")
+listLayout.Padding = UDim.new(0, 6) -- Расстояние между кнопками
+listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+listLayout.Parent = scroll
+
+-- Обновленная функция создания кнопок (больше не нужны координаты X и Y)
+local function createButton(name, color)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -20, 0, 40)
-    btn.Position = pos
+    btn.Size = UDim2.new(0.9, 0, 0, 40)
     btn.BackgroundColor3 = color
     btn.Text = name
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
     btn.TextSize = 13
     btn.Font = Enum.Font.SourceSansBold
-    btn.Parent = f
+    btn.Parent = scroll
     local btnCorner = Instance.new("UICorner")
     btnCorner.CornerRadius = UDim.new(0, 6)
     btnCorner.Parent = btn
     return btn
 end
 
--- Кнопки управления
-local speedBtn = createButton("SPEED", UDim2.new(0, 10, 0, 35), Color3.fromRGB(0, 120, 200))
-local jumpBtn = createButton("HIGH JUMP", UDim2.new(0, 10, 0, 85), Color3.fromRGB(160, 40, 160))
-local goldBtn = createButton("GOLD INF JUMP", UDim2.new(0, 10, 0, 135), Color3.fromRGB(212, 175, 55))
-local magnetBtn = createButton("MAGNET", UDim2.new(0, 10, 0, 185), Color3.fromRGB(0, 150, 90))
-local pushBtn = createButton("PUSH AURA", UDim2.new(0, 10, 0, 235), Color3.fromRGB(200, 50, 50))
-local flyBtn = createButton("FLY", UDim2.new(0, 10, 0, 285), Color3.fromRGB(130, 130, 30))
-local tpBtn = createButton("CLICK TP", UDim2.new(0, 10, 0, 335), Color3.fromRGB(120, 30, 130))
-local btoolsBtn = createButton("BTOOLS", UDim2.new(0, 10, 0, 385), Color3.fromRGB(180, 100, 30))
+-- ================= СОЗДАНИЕ КНОПОК =================
+local speedBtn = createButton("SPEED", Color3.fromRGB(0, 120, 200))
+local jumpBtn = createButton("HIGH JUMP", Color3.fromRGB(160, 40, 160))
+local goldBtn = createButton("GOLD INF JUMP", Color3.fromRGB(212, 175, 55))
+local magnetBtn = createButton("MAGNET", Color3.fromRGB(0, 150, 90))
+local pushBtn = createButton("PUSH AURA", Color3.fromRGB(200, 50, 50))
+local flyBtn = createButton("FLY", Color3.fromRGB(130, 130, 30))
+local tpBtn = createButton("CLICK TP", Color3.fromRGB(120, 30, 130))
+local spinBtn = createButton("SPINBOT", Color3.fromRGB(200, 100, 0))    -- НОВАЯ
+local airBtn = createButton("AIR WALK", Color3.fromRGB(0, 200, 200))    -- НОВАЯ
+local xrayBtn = createButton("X-RAY", Color3.fromRGB(100, 100, 100))    -- НОВАЯ
+local btoolsBtn = createButton("BTOOLS", Color3.fromRGB(180, 100, 30))
 
--- ПОЛЕ ДЛЯ ВВОДА РАЗМЕРА БЛОКА
 local sizeInput = Instance.new("TextBox")
-sizeInput.Size = UDim2.new(1, -20, 0, 40)
-sizeInput.Position = UDim2.new(0, 10, 0, 435)
+sizeInput.Size = UDim2.new(0.9, 0, 0, 40)
 sizeInput.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
 sizeInput.Text = "4"
 sizeInput.PlaceholderText = "Размер"
@@ -77,36 +95,99 @@ sizeInput.TextColor3 = Color3.fromRGB(255, 215, 0)
 sizeInput.TextSize = 14
 sizeInput.Font = Enum.Font.SourceSansBold
 sizeInput.ClearTextOnFocus = false
-sizeInput.Parent = f
+sizeInput.Parent = scroll
+local sizeCorner = Instance.new("UICorner") sizeCorner.CornerRadius = UDim.new(0, 6) sizeCorner.Parent = sizeInput
 
-local sizeCorner = Instance.new("UICorner")
-sizeCorner.CornerRadius = UDim.new(0, 6)
-sizeCorner.Parent = sizeInput
+local shapeBtn = createButton("SHAPE: CUBE", Color3.fromRGB(70, 70, 80))
 
--- КНОПКА ВЫБОРА ФОРМЫ БЛОКА
-local shapeBtn = createButton("SHAPE: CUBE", UDim2.new(0, 10, 0, 480), Color3.fromRGB(70, 70, 80))
+-- ================= ЛОГИКА НОВЫХ ФУНКЦИЙ =================
 
--- Таблица доступных форм
-local shapes = {Enum.PartType.Block, Enum.PartType.Ball, Enum.PartType.Cylinder}
-local shapeNames = {"CUBE", "BALL", "CYLINDER"}
-local currentShapeIndex = 1
-
-shapeBtn.MouseButton1Click:Connect(function()
-    currentShapeIndex = currentShapeIndex + 1
-    if currentShapeIndex > #shapes then currentShapeIndex = 1 end
-    shapeBtn.Text = "SHAPE: " .. shapeNames[currentShapeIndex]
+-- 1. SPINBOT (Торнадо)
+local spinEnabled, spinVelocity = false, nil
+spinBtn.MouseButton1Click:Connect(function()
+    spinEnabled = not spinEnabled
+    local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+    if not spinEnabled then
+        spinBtn.Text = "SPINBOT" spinBtn.BackgroundColor3 = Color3.fromRGB(200, 100, 0)
+        if spinVelocity then spinVelocity:Destroy() spinVelocity = nil end
+        return
+    end
+    if root then
+        spinBtn.Text = "SPINBOT: ON" spinBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
+        spinVelocity = Instance.new("BodyAngularVelocity")
+        spinVelocity.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
+        -- Крутимся по оси Y (вокруг своей оси) с огромной скоростью 150
+        spinVelocity.AngularVelocity = Vector3.new(0, 150, 0)
+        spinVelocity.Parent = root
+    end
 end)
 
--- Функция получения размера
-local function getBlockSize()
-    local val = tonumber(sizeInput.Text)
-    if val and val > 0.1 then return val end
-    return 4
-end
+-- 2. AIR WALK (Невидимый мост)
+local airWalkEnabled, airPart, airConnection = false, nil, nil
+airBtn.MouseButton1Click:Connect(function()
+    airWalkEnabled = not airWalkEnabled
+    if not airWalkEnabled then
+        airBtn.Text = "AIR WALK" airBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 200)
+        if airPart then airPart:Destroy() airPart = nil end
+        if airConnection then airConnection:Disconnect() airConnection = nil end
+        return
+    end
+    local root = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+    if root then
+        airBtn.Text = "AIR WALK: ON" airBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
+        
+        airPart = Instance.new("Part")
+        airPart.Name = "AirWalk_" .. lp.Name
+        airPart.Size = Vector3.new(6, 1, 6)
+        airPart.Transparency = 0.5 -- Слегка видно, как стеклянный пол
+        airPart.Color = Color3.fromRGB(0, 255, 255)
+        airPart.Material = Enum.Material.Neon
+        airPart.Anchored = true
+        airPart.CanCollide = true
+        airPart.Parent = workspace
+        
+        -- Фиксируем высоту в момент включения скрипта (-3.2 это чуть ниже ног)
+        local fixedY = root.Position.Y - 3.2
+        
+        airConnection = RunService.Heartbeat:Connect(function()
+            local r = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+            if r and airPart then
+                -- Пол двигается за игроком по осям X и Z, но высота (Y) заморожена!
+                airPart.Position = Vector3.new(r.Position.X, fixedY, r.Position.Z)
+            end
+        end)
+    end
+end)
 
--- ================= ЛОГИКА ОСТАЛЬНЫХ ФУНКЦИЙ =================
+-- 3. X-RAY (Просмотр сквозь стены)
+local xrayEnabled = false
+local originalTransparencies = {} -- Сюда будем сохранять оригинальную прозрачность блоков
+xrayBtn.MouseButton1Click:Connect(function()
+    xrayEnabled = not xrayEnabled
+    if not xrayEnabled then
+        xrayBtn.Text = "X-RAY" xrayBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        -- Возвращаем всё как было
+        for part, origTrans in pairs(originalTransparencies) do
+            if part and part.Parent then part.Transparency = origTrans end
+        end
+        originalTransparencies = {} -- Очищаем память
+        return
+    end
+    
+    xrayBtn.Text = "X-RAY: ON" xrayBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
+    -- Сканируем весь мир
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        -- Проверяем, что это физический блок и он НЕ является частью нашего персонажа
+        if obj:IsA("BasePart") and not obj:IsDescendantOf(lp.Character) then
+            originalTransparencies[obj] = obj.Transparency -- Запоминаем
+            obj.Transparency = 0.75 -- Делаем полупрозрачным
+        end
+    end
+end)
 
--- Скорость
+-- ================= ЛОГИКА СТАРЫХ ФУНКЦИЙ =================
+-- (Она осталась без изменений, чтобы всё работало как часы)
+
 speedBtn.MouseButton1Click:Connect(function()
     local hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
     if hum then
@@ -115,7 +196,6 @@ speedBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Прыжок
 jumpBtn.MouseButton1Click:Connect(function()
     local hum = lp.Character and lp.Character:FindFirstChildOfClass("Humanoid")
     if hum then
@@ -124,7 +204,6 @@ jumpBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Золотой инф-прыжок
 local infJumpEnabled, goldFolder, goldConnection, jumpConnection = false, nil, nil, nil
 goldBtn.MouseButton1Click:Connect(function()
     infJumpEnabled = not infJumpEnabled
@@ -156,11 +235,9 @@ goldBtn.MouseButton1Click:Connect(function()
     end)
 end)
 
--- Магнит
 local magnetEnabled, magnetConnection, magnetRing = false, nil, nil
 magnetBtn.MouseButton1Click:Connect(function()
     magnetEnabled = not magnetEnabled
-    if pushEnabled and magnetEnabled then pushBtn.Click() end
     if not magnetEnabled then
         magnetBtn.Text = "MAGNET" magnetBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 90)
         if magnetConnection then magnetConnection:Disconnect() magnetConnection = nil end
@@ -182,11 +259,9 @@ magnetBtn.MouseButton1Click:Connect(function()
     end)
 end)
 
--- Толкатель
 local pushEnabled, pushConnection, pushRing = false, nil, nil
 pushBtn.MouseButton1Click:Connect(function()
     pushEnabled = not pushEnabled
-    if magnetEnabled and pushEnabled then magnetBtn.Click() end
     if not pushEnabled then
         pushBtn.Text = "PUSH AURA" pushBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
         if pushConnection then pushConnection:Disconnect() pushConnection = nil end
@@ -208,7 +283,6 @@ pushBtn.MouseButton1Click:Connect(function()
     end)
 end)
 
--- Полет
 local flyEnabled, flyConnection, bv, bg = false, nil, nil, nil
 flyBtn.MouseButton1Click:Connect(function()
     flyEnabled = not flyEnabled
@@ -245,7 +319,6 @@ flyBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Телепорт
 local tpEnabled, tpTool = false, nil
 local function giveTpTool()
     tpTool = Instance.new("Tool") tpTool.Name = "Click TP" tpTool.RequiresHandle = false tpTool.Parent = lp.Backpack
@@ -261,95 +334,64 @@ tpBtn.MouseButton1Click:Connect(function()
     tpBtn.Text = "TP TOOL: ON" tpBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100) giveTpTool()
 end)
 
--- ================= НАБОР BTOOLS С ДИНАМИЧЕСКОЙ ФОРМОЙ И РАЗМЕРОМ =================
-local btoolsEnabled = false
-local btoolsDeleteTool = nil
-local btoolsMoveTool = nil
-local btoolsAnchoredTool = nil
-local btoolsPhysicsTool = nil
-local selectedPart = nil
+-- BTOOLS (Форма и размер)
+local shapes = {Enum.PartType.Block, Enum.PartType.Ball, Enum.PartType.Cylinder}
+local shapeNames = {"CUBE", "BALL", "CYLINDER"}
+local currentShapeIndex = 1
 
+shapeBtn.MouseButton1Click:Connect(function()
+    currentShapeIndex = currentShapeIndex + 1
+    if currentShapeIndex > #shapes then currentShapeIndex = 1 end
+    shapeBtn.Text = "SHAPE: " .. shapeNames[currentShapeIndex]
+end)
+
+local function getBlockSize()
+    local val = tonumber(sizeInput.Text)
+    if val and val > 0.1 then return val end
+    return 4
+end
+
+local btoolsEnabled, btoolsDeleteTool, btoolsMoveTool, btoolsAnchoredTool, btoolsPhysicsTool, selectedPart = false, nil, nil, nil, nil, nil
 local function giveBTools()
-    -- 1. Удаление
-    btoolsDeleteTool = Instance.new("Tool")
-    btoolsDeleteTool.Name = "BTools (Delete)"
-    btoolsDeleteTool.RequiresHandle = false
-    btoolsDeleteTool.Parent = lp.Backpack
+    btoolsDeleteTool = Instance.new("Tool") btoolsDeleteTool.Name = "BTools (Delete)" btoolsDeleteTool.RequiresHandle = false btoolsDeleteTool.Parent = lp.Backpack
     btoolsDeleteTool.Activated:Connect(function()
         local mouse = lp:GetMouse()
-        if mouse and mouse.Target then
-            local target = mouse.Target
-            if target.Name ~= "Baseplate" and not target:IsA("Terrain") then
-                local isPlayer = target:FindFirstAncestorOfClass("Model") and target:FindFirstAncestorOfClass("Model"):FindFirstChildOfClass("Humanoid")
-                if not isPlayer and target.Parent ~= lp.Character then target:Destroy() end
-            end
+        if mouse and mouse.Target and mouse.Target.Name ~= "Baseplate" and not mouse.Target:IsA("Terrain") then
+            if not (mouse.Target:FindFirstAncestorOfClass("Model") and mouse.Target:FindFirstAncestorOfClass("Model"):FindFirstChildOfClass("Humanoid")) then mouse.Target:Destroy() end
         end
     end)
-
-    -- 2. Перемещение
-    btoolsMoveTool = Instance.new("Tool")
-    btoolsMoveTool.Name = "BTools (Move)"
-    btoolsMoveTool.RequiresHandle = false
-    btoolsMoveTool.Parent = lp.Backpack
+    btoolsMoveTool = Instance.new("Tool") btoolsMoveTool.Name = "BTools (Move)" btoolsMoveTool.RequiresHandle = false btoolsMoveTool.Parent = lp.Backpack
     btoolsMoveTool.Activated:Connect(function()
         local mouse = lp:GetMouse()
         if not mouse then return end
         if selectedPart then
             if selectedPart.Parent then selectedPart.Position = mouse.Hit.Position + Vector3.new(0, selectedPart.Size.Y / 2, 0) end
-            selectedPart = nil
-            btoolsMoveTool.Name = "BTools (Move)"
-        else
-            local target = mouse.Target
-            if target and target.Name ~= "Baseplate" and not target:IsA("Terrain") then
-                local isPlayer = target:FindFirstAncestorOfClass("Model") and target:FindFirstAncestorOfClass("Model"):FindFirstChildOfClass("Humanoid")
-                if not isPlayer and target.Parent ~= lp.Character then
-                    selectedPart = target
-                    btoolsMoveTool.Name = "[ КЛИКНИ КУДА ПЕРЕНЕСТИ ]"
-                end
+            selectedPart = nil btoolsMoveTool.Name = "BTools (Move)"
+        elseif mouse.Target and mouse.Target.Name ~= "Baseplate" and not mouse.Target:IsA("Terrain") then
+            if not (mouse.Target:FindFirstAncestorOfClass("Model") and mouse.Target:FindFirstAncestorOfClass("Model"):FindFirstChildOfClass("Humanoid")) then
+                selectedPart = mouse.Target btoolsMoveTool.Name = "[ КЛИКНИ КУДА ПЕРЕНЕСТИ ]"
             end
         end
     end)
     btoolsMoveTool.Unequipped:Connect(function() selectedPart = nil btoolsMoveTool.Name = "BTools (Move)" end)
 
-    -- 3. Создание СТАТИЧЕСКОГО блока (Anchored) с выбранной формой
-    btoolsAnchoredTool = Instance.new("Tool")
-    btoolsAnchoredTool.Name = "BTools (Create Anchored)"
-    btoolsAnchoredTool.RequiresHandle = false
-    btoolsAnchoredTool.Parent = lp.Backpack
+    btoolsAnchoredTool = Instance.new("Tool") btoolsAnchoredTool.Name = "BTools (Create Anchored)" btoolsAnchoredTool.RequiresHandle = false btoolsAnchoredTool.Parent = lp.Backpack
     btoolsAnchoredTool.Activated:Connect(function()
         local mouse = lp:GetMouse()
         if mouse and mouse.Hit then
             local size = getBlockSize()
-            local newPart = Instance.new("Part")
-            newPart.Shape = shapes[currentShapeIndex] -- Установка формы
-            newPart.Size = Vector3.new(size, size, size)
-            newPart.Position = mouse.Hit.Position + Vector3.new(0, size / 2, 0)
-            newPart.Anchored = true
-            newPart.CanCollide = true
-            newPart.Material = Enum.Material.SmoothPlastic
-            newPart.Color = Color3.fromRGB(0, 150, 255)
-            newPart.Parent = workspace
+            local newPart = Instance.new("Part") newPart.Shape = shapes[currentShapeIndex] newPart.Size = Vector3.new(size, size, size)
+            newPart.Position = mouse.Hit.Position + Vector3.new(0, size / 2, 0) newPart.Anchored = true newPart.Material = Enum.Material.SmoothPlastic newPart.Color = Color3.fromRGB(0, 150, 255) newPart.Parent = workspace
         end
     end)
 
-    -- 4. Создание ФИЗИЧЕСКОГО блока (No Anchored) с выбранной формой
-    btoolsPhysicsTool = Instance.new("Tool")
-    btoolsPhysicsTool.Name = "BTools (Create Physics)"
-    btoolsPhysicsTool.RequiresHandle = false
-    btoolsPhysicsTool.Parent = lp.Backpack
+    btoolsPhysicsTool = Instance.new("Tool") btoolsPhysicsTool.Name = "BTools (Create Physics)" btoolsPhysicsTool.RequiresHandle = false btoolsPhysicsTool.Parent = lp.Backpack
     btoolsPhysicsTool.Activated:Connect(function()
         local mouse = lp:GetMouse()
         if mouse and mouse.Hit then
             local size = getBlockSize()
-            local newPart = Instance.new("Part")
-            newPart.Shape = shapes[currentShapeIndex] -- Установка формы
-            newPart.Size = Vector3.new(size, size, size)
-            newPart.Position = mouse.Hit.Position + Vector3.new(0, size / 2, 0)
-            newPart.Anchored = false
-            newPart.CanCollide = true
-            newPart.Material = Enum.Material.SmoothPlastic
-            newPart.Color = Color3.fromRGB(255, 130, 0)
-            newPart.Parent = workspace
+            local newPart = Instance.new("Part") newPart.Shape = shapes[currentShapeIndex] newPart.Size = Vector3.new(size, size, size)
+            newPart.Position = mouse.Hit.Position + Vector3.new(0, size / 2, 0) newPart.Anchored = false newPart.Material = Enum.Material.SmoothPlastic newPart.Color = Color3.fromRGB(255, 130, 0) newPart.Parent = workspace
         end
     end)
 end
@@ -357,8 +399,7 @@ end
 btoolsBtn.MouseButton1Click:Connect(function()
     btoolsEnabled = not btoolsEnabled
     if not btoolsEnabled then
-        btoolsBtn.Text = "BTOOLS"
-        btoolsBtn.BackgroundColor3 = Color3.fromRGB(180, 100, 30)
+        btoolsBtn.Text = "BTOOLS" btoolsBtn.BackgroundColor3 = Color3.fromRGB(180, 100, 30)
         if btoolsDeleteTool then btoolsDeleteTool:Destroy() btoolsDeleteTool = nil end
         if btoolsMoveTool then btoolsMoveTool:Destroy() btoolsMoveTool = nil end
         if btoolsAnchoredTool then btoolsAnchoredTool:Destroy() btoolsAnchoredTool = nil end
@@ -366,16 +407,12 @@ btoolsBtn.MouseButton1Click:Connect(function()
         selectedPart = nil
         return
     end
-    btoolsBtn.Text = "BTOOLS: ON"
-    btoolsBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
+    btoolsBtn.Text = "BTOOLS: ON" btoolsBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
     giveBTools()
 end)
 
--- Перевыдача при спавне
 lp.CharacterAdded:Connect(function()
     task.wait(0.5)
     if tpEnabled then giveTpTool() end
     if btoolsEnabled then giveBTools() end
 end)
-
-print("God Menu v8.5 загружено. Полный контроль над формой и размером!")
