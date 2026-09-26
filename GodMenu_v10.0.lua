@@ -6,7 +6,7 @@ local gui = lp:WaitForChild("PlayerGui")
 
 if gui:FindFirstChild("SuperMenuUI_V10") then gui.SuperMenuUI_V10:Destroy() end
 for _, v in ipairs(workspace:GetChildren()) do 
-    if v.Name:match("^GoldOrbit_") or v.Name:match("^MagnetRing_") or v.Name:match("^PushRing_") or v.Name:match("^AirWalk_") then v:Destroy() end 
+    if v.Name:match("^GoldOrbit_") or v.Name:match("^MAGNETRing_") or v.Name:match("^PUSHRing_") or v.Name:match("^AirWalk_") then v:Destroy() end 
 end
 for _, t in ipairs({"Click TP", "BTools (Delete)", "BTools (Move)", "BTools (Create)", "BTools (Create Anchored)", "BTools (Create Physics)", "Click Fling"}) do
     if lp.Backpack:FindFirstChild(t) then lp.Backpack[t]:Destroy() end
@@ -124,7 +124,7 @@ jumpBtn.MouseButton1Click:Connect(function()
     if h then h.JumpPower = h.JumpPower == 50 and 150 or 50 h.JumpHeight = h.JumpPower == 150 and 50 or 7 h.UseJumpPower = true jumpBtn.Text, jumpBtn.BackgroundColor3 = h.JumpPower == 150 and "H-JUMP: ON" or "HIGH JUMP", h.JumpPower == 150 and Color3.fromRGB(0, 180, 100) or Color3.fromRGB(160, 40, 160) end
 end)
 
--- GOLD JUMP / MAGNET / PUSH
+-- GOLD JUMP
 local gjOn, gFold, gC, jC = false, nil, nil, nil
 goldBtn.MouseButton1Click:Connect(function()
     gjOn = not gjOn
@@ -142,27 +142,57 @@ goldBtn.MouseButton1Click:Connect(function()
     jC = UserInputService.JumpRequest:Connect(function() local r = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") if r and gjOn then r.Velocity = Vector3.new(r.Velocity.X, 60, r.Velocity.Z) end end)
 end)
 
-local function makeAura(name, color, size, isPush)
-    local on, ring, conn = false, nil, nil
+-- MAGNET & PUSH AURA (ИСПРАВЛЕНО ВЫКЛЮЧЕНИЕ)
+local function createAuraSystem(name, color, size, isPush)
+    local on = false
+    local ring = nil
+    local conn = nil
+
     return function(btn)
         on = not on
-        btn.Text, btn.BackgroundColor3 = on and (name..": ON") or name, on and Color3.fromRGB(0, 180, 100) or color
-        if not on then if ring then ring:Destroy() ring = nil end if conn then conn:Disconnect() conn = nil end return end
-        ring = Instance.new("Part", workspace) ring.Name = name.."Ring_"..lp.Name ring.Shape, ring.Size, ring.Orientation, ring.Color, ring.Material, ring.Transparency, ring.Anchored, ring.CanCollide = Enum.PartType.Cylinder, size, Vector3.new(0,0,90), color, Enum.Material.Neon, isPush and 0.88 or 0.9, true, false
+        if not on then
+            btn.Text = name
+            btn.BackgroundColor3 = color
+            if conn then conn:Disconnect() conn = nil end
+            if ring then ring:Destroy() ring = nil end
+            return
+        end
+
+        btn.Text = name .. ": ON"
+        btn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
+
+        ring = Instance.new("Part", workspace)
+        ring.Name = name .. "Ring_" .. lp.Name
+        ring.Shape = Enum.PartType.Cylinder
+        ring.Size = size
+        ring.Orientation = Vector3.new(0, 0, 90)
+        ring.Color = color
+        ring.Material = Enum.Material.Neon
+        ring.Transparency = isPush and 0.88 or 0.9
+        ring.Anchored = true
+        ring.CanCollide = false
+
         conn = RunService.Heartbeat:Connect(function()
-            local r = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart") if not r or not ring then return end
+            local r = lp.Character and lp.Character:FindFirstChild("HumanoidRootPart")
+            if not r or not ring or not ring.Parent then return end
             ring.Position = r.Position - Vector3.new(0, 2.5, 0)
             for _, o in ipairs(workspace:GetDescendants()) do
                 if o:IsA("BasePart") and not o.Anchored and o.Parent ~= lp.Character and not o.Parent:FindFirstChildOfClass("Humanoid") then
                     local d = (r.Position - o.Position).Magnitude
-                    if d <= size.Y/2 then o.Velocity = isPush and ((o.Position - r.Position).Unit * 70 + Vector3.new(0, 20, 0)) or ((r.Position - o.Position).Unit * 40) end
+                    if d <= size.Y / 2 then
+                        o.Velocity = isPush and ((o.Position - r.Position).Unit * 70 + Vector3.new(0, 20, 0)) or ((r.Position - o.Position).Unit * 40)
+                    end
                 end
             end
         end)
     end
 end
-magnetBtn.MouseButton1Click:Connect(function() makeAura("MAGNET", Color3.fromRGB(0, 150, 90), Vector3.new(0.2, 60, 60), false)(magnetBtn) end)
-pushBtn.MouseButton1Click:Connect(function() makeAura("PUSH", Color3.fromRGB(200, 50, 50), Vector3.new(0.2, 50, 50), true)(pushBtn) end)
+
+local handleMagnet = createAuraSystem("MAGNET", Color3.fromRGB(0, 150, 90), Vector3.new(0.2, 60, 60), false)
+local handlePush = createAuraSystem("PUSH AURA", Color3.fromRGB(200, 50, 50), Vector3.new(0.2, 50, 50), true)
+
+magnetBtn.MouseButton1Click:Connect(function() handleMagnet(magnetBtn) end)
+pushBtn.MouseButton1Click:Connect(function() handlePush(pushBtn) end)
 
 -- FLY
 local flyOn, flyC, fV, fG = false, nil, nil, nil
